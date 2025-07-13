@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 9000
 
 // middleware
 const corsOptions = {
@@ -36,7 +36,9 @@ const verifyToken = async (req, res, next) => {
   })
 }
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@main.mq0mae1.mongodb.net/?retryWrites=true&w=majority&appName=Main`
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.iy6spfv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -88,13 +90,43 @@ async function run() {
       res.send(result)
     })
 
+    //save a room in db
+    app.post('/room', async(req,res)=>{
+      const roomData=req.body;
+      const result=await roomsCollection.insertOne(roomData);
+      res.send(result)
+
+    })
+
+    //delete a room in db
+    app.delete('/room/:id', async(req,res)=>{
+      const id=req.params.id;
+      const query={_id: new ObjectId(id)}
+      const result=await roomsCollection.deleteOne(query);
+      
+      res.send(result)
+    })
+
+    //get all rooms for host
+      app.get('/my-listings/:email', async (req, res) => {
+      const email = req.params.email
+      console.log(email)
+      let query = {'host.email':email}
+     
+      const result = await roomsCollection.find(query).toArray()
+      console.log('Rooms found:', result.length);
+
+      res.send(result)
+    })
+
+
     // Get a single room data from db using _id
     app.get('/room/:id', async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
       const result = await roomsCollection.findOne(query)
       res.send(result)
-    })
+    }) 
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
