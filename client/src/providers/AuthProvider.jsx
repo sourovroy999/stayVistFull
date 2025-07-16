@@ -49,11 +49,21 @@ const AuthProvider = ({ children }) => {
     return signOut(auth)
   }
 
-  const updateUserProfile = (name, photo) => {
-    return updateProfile(auth.currentUser, {
+  const updateUserProfile =async (name, photo) => {  
+    await updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photo,
     })
+
+    setUser({
+      ...auth.currentUser,
+      displayName:name,
+      photoURL:photo
+    })
+
+    return true
+
+   
   }
   // Get token from server
   const getToken = async email => {
@@ -65,12 +75,25 @@ const AuthProvider = ({ children }) => {
     return data
   }
 
+  const saveUser=async user=>{
+
+    const currentUser={
+      email:user?.email,
+      role:'guest',
+      status:'Verified',
+    }
+
+    const {data}=await axios.put(`${import.meta.env.VITE_API_URL}/user`, currentUser)
+    return data
+  }
+
   // onAuthStateChange
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, currentUser => {
       setUser(currentUser)
       if (currentUser) {
         getToken(currentUser.email)
+        saveUser(currentUser)
       }
       setLoading(false)
     })

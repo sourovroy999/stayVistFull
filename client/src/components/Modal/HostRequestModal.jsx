@@ -1,13 +1,14 @@
+import PropTypes from 'prop-types'
 import {
   Dialog,
   Transition,
   TransitionChild,
-  DialogPanel,
   DialogTitle,
+  DialogPanel,
 } from '@headlessui/react'
 import { Fragment } from 'react'
-import PropTypes from 'prop-types'
-const DeleteModal = ({ closeModal, isOpen, handleDelete , id}) => {
+
+const HostModal = ({ closeModal, isOpen, modalHandler }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={closeModal}>
@@ -37,32 +38,31 @@ const DeleteModal = ({ closeModal, isOpen, handleDelete , id}) => {
               <DialogPanel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all'>
                 <DialogTitle
                   as='h3'
-                  className='text-lg font-medium leading-6 text-gray-900'
+                  className='text-lg font-medium text-center leading-6 text-gray-900'
                 >
-                  Are you sure?
+                  Become A Host!
                 </DialogTitle>
                 <div className='mt-2'>
                   <p className='text-sm text-gray-500'>
-                    You cannot undo once it&apos;s done!
+                    Please read all the terms & conditions before becoming a
+                    host.
                   </p>
                 </div>
                 <hr className='mt-8 ' />
                 <div className='flex mt-2 justify-around'>
-                  <button onClick= {()=> {
-                    handleDelete(id)
-                    closeModal()
-                  }}
+                  <button 
+                  onClick={modalHandler}
                     type='button'
-                    className='inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
+                    className='inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
                   >
-                    Yes
+                    Continue
                   </button>
                   <button
                     type='button'
-                    className='inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
+                    className='inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
                     onClick={closeModal}
                   >
-                    No
+                    Cancel
                   </button>
                 </div>
               </DialogPanel>
@@ -74,9 +74,10 @@ const DeleteModal = ({ closeModal, isOpen, handleDelete , id}) => {
   )
 }
 
-DeleteModal.propTypes = {
+HostModal.propTypes = {
   closeModal: PropTypes.func,
   isOpen: PropTypes.bool,
+  modalHandler:PropTypes.func
 }
 
-export default DeleteModal
+export default HostModal

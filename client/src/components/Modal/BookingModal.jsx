@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import {
   Dialog,
   Transition,
@@ -5,9 +6,10 @@ import {
   DialogPanel,
   DialogTitle,
 } from '@headlessui/react'
+import { format } from 'date-fns'
 import { Fragment } from 'react'
-import PropTypes from 'prop-types'
-const DeleteModal = ({ closeModal, isOpen, handleDelete , id}) => {
+
+const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as='div' className='relative z-10' onClose={closeModal}>
@@ -37,46 +39,75 @@ const DeleteModal = ({ closeModal, isOpen, handleDelete , id}) => {
               <DialogPanel className='w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all'>
                 <DialogTitle
                   as='h3'
-                  className='text-lg font-medium leading-6 text-gray-900'
+                  className='text-lg font-medium text-center leading-6 text-gray-900'
                 >
-                  Are you sure?
+                  Review Info Before Reserve
                 </DialogTitle>
                 <div className='mt-2'>
                   <p className='text-sm text-gray-500'>
-                    You cannot undo once it&apos;s done!
+                    Room: {bookingInfo?.title}
+                  </p>
+                </div>
+                <div className='mt-2'>
+                  <p className='text-sm text-gray-500'>
+                    Location: {bookingInfo?.location}
+                  </p>
+                </div>
+                <div className='mt-2'>
+                  <p className='text-sm text-gray-500'>
+                    Guest: {bookingInfo?.guest?.name}
+                  </p>
+                </div>
+                <div className='mt-2'>
+                  <p className='text-sm text-gray-500'>
+                    From: {format(new Date(bookingInfo?.from), 'PP')} - To:{' '}
+                    {format(new Date(bookingInfo?.to), 'PP')}
+                  </p>
+                </div>
+
+                <div className='mt-2'>
+                  <p className='text-sm text-gray-500'>
+                    Price: $ {bookingInfo?.price}
                   </p>
                 </div>
                 <hr className='mt-8 ' />
-                <div className='flex mt-2 justify-around'>
+                {/* checkout form */}
+                 <div className='flex mt-2 justify-around'>
                   <button onClick= {()=> {
-                    handleDelete(id)
+                    
                     closeModal()
                   }}
                     type='button'
                     className='inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
                   >
-                    Yes
+                    Cancel
                   </button>
                   <button
                     type='button'
                     className='inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2'
                     onClick={closeModal}
                   >
-                    No
+                    Confirm Booking
                   </button>
                 </div>
               </DialogPanel>
             </TransitionChild>
           </div>
+          
+          
         </div>
+
+
+        
       </Dialog>
     </Transition>
   )
 }
 
-DeleteModal.propTypes = {
+BookingModal.propTypes = {
+  bookingInfo: PropTypes.object,
   closeModal: PropTypes.func,
   isOpen: PropTypes.bool,
 }
 
-export default DeleteModal
+export default BookingModal

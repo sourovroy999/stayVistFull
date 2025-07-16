@@ -10,6 +10,12 @@ import DashboardLayout from '../layouts/DashboardLayout'
 import Statistics from '../pages/Dashboard/Common/Statistics'
 import AddRoom from '../pages/Dashboard/Host/AddRoom'
 import MyListings from '../pages/Dashboard/Host/MyListings'
+import Profile from '../pages/Dashboard/Common/Profile'
+import ManageUsers from '../pages/Dashboard/Admin/ManageUsers'
+import AdminRoute from './AdminRoute'
+import HostRoute from './HostRoute'
+import MyBookings from '../pages/Dashboard/Guest/MyBookings'
+import ManageBookings from '../pages/Dashboard/Host/ManageBookings'
 
 export const router = createBrowserRouter([
   {
@@ -35,27 +41,57 @@ export const router = createBrowserRouter([
   { path: '/signup', element: <SignUp /> },
 
   {
-    path:'/dashboard',
-    element: <DashboardLayout/>,
-    children:[
-      {
-        index:true,
-        element:<Statistics/>
-      },
-      {
-        path:'addroom',
-        element:<AddRoom/>
-      },
-      {
-        path:'add-room',
-        element:<AddRoom/>
-      },
-      {
-        path:'my-listings',
-        element:<MyListings/>
-      },
+    path: '/dashboard',
+    element: <PrivateRoute>
 
-      
+      <DashboardLayout />,
+    </PrivateRoute>,
+    children: [
+      {
+        index: true,
+        element: <Statistics />
+      },
+      {
+        path: 'add-room',
+        element: (<HostRoute>
+          <AddRoom />
+        </HostRoute>)
+      },
+      {
+        path: 'my-listings',
+        element: (<HostRoute>
+          <MyListings />
+        </HostRoute>)
+      },
+      {
+        path: 'manage-users',
+        element: (<AdminRoute>
+          <ManageUsers />
+        </AdminRoute>)
+      },
+      {
+        path: 'profile',
+        element: <Profile />
+      },
+      {
+        path: 'my-bookings',
+        element: (<PrivateRoute>
+
+
+          <MyBookings />
+        </PrivateRoute>)
+      }
+      ,
+      {
+        path: 'manage-bookings',
+        element: (<PrivateRoute>
+          <HostRoute>
+            <ManageBookings />
+          </HostRoute>
+        </PrivateRoute>)
+      }
+
+
 
     ],
 

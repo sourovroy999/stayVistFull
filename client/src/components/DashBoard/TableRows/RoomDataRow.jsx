@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import DeleteModal from '../../Modal/DeleteModal'
 import { useState } from 'react'
 
-const RoomDataRow = ({ room,handleDelete, refetch }) => {
+const RoomDataRow = ({ room,handleDelete }) => {
 
 
     //for delete modal
