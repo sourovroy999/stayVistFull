@@ -3,8 +3,10 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion, ObjectId, Timestamp } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
+
+const stripe=require("stripe")(process.env.VITE_STRIPE_SECRET_KEY)
 
 const port = process.env.PORT || 9000
 
@@ -49,8 +51,11 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    const roomsCollection = client.db('stayvista').collection('rooms')
-    const usersCollection = client.db('stayvista').collection('users')
+    const db=client.db('stayvista')
+    const roomsCollection = db.collection('rooms')
+    const usersCollection = db.collection('users')
+
+    const bookingsCollection=db.collection('bookings')
 
 
     const verifyHost= async (req,res,next)=>{
@@ -112,6 +117,42 @@ async function run() {
         res.status(500).send(err)
       }
     })
+
+
+    //create payment intent
+    app.post("/create-payment-intent",verifyToken, async (req, res) => {
+      console.log(req.body);
+
+      // console.log(res);
+
+      
+      
+  const price = req.body.price;
+  console.log(price);
+  
+  const priceInCent=parseFloat(price)*100;
+  console.log(priceInCent);
+  
+
+  if(!price || priceInCent<1) return
+
+
+  // Create a PaymentIntent with the order amount and currency
+
+  //generate client secret
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: priceInCent,
+    currency: "usd",
+    automatic_payment_methods: {
+      enabled: true,
+    },
+  });
+
+//send client secret as response
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
 
     //save user data in db
     app.put('/user', async(req,res)=>{
@@ -221,6 +262,27 @@ async function run() {
       console.log('Rooms found:', result.length);
 
       res.send(result)
+    })
+
+       //save a booking in db
+    app.post('/booking',verifyToken, async(req,res)=>{
+      const bookingData=req.body;
+      const result=await bookingsCollection.insertOne(bookingData);
+
+      //change room availiability status
+      const roomId=bookingData?.roomId;
+      const query={_id: new ObjectId(roomId)}
+      const updatedDoc={
+        $set:{
+          booked: true
+        }
+      }
+      const updatedRoom=await roomsCollection.updateOne(query, updatedDoc)
+      console.log(updatedDoc);
+      
+      res.send({result,updatedRoom})
+
+
     })
 
 
