@@ -267,22 +267,48 @@ async function run() {
        //save a booking in db
     app.post('/booking',verifyToken, async(req,res)=>{
       const bookingData=req.body;
+
+      //insert bookings collection
       const result=await bookingsCollection.insertOne(bookingData);
 
+      // //change room availiability status
+      // const roomId=bookingData?.roomId;
+      // const query={_id: new ObjectId(roomId)}
+      // const updatedDoc={
+      //   $set:{
+      //     booked: true
+      //   }
+      // }
+
+      
+      // const updatedRoom=await roomsCollection.updateOne(query, updatedDoc)
+      // console.log(updatedDoc);      
+      
+      res.send(result)
+
+    })
+
+    //update room status
+
+    app.patch('/room/status/:id',verifyToken, async(req,res)=>{
+
+      const id=req.params.id;
+      const {status}=req.body;
       //change room availiability status
-      const roomId=bookingData?.roomId;
-      const query={_id: new ObjectId(roomId)}
+     
+      const query={_id: new ObjectId(id)}
       const updatedDoc={
         $set:{
-          booked: true
+          booked: status
         }
       }
-      const updatedRoom=await roomsCollection.updateOne(query, updatedDoc)
-      console.log(updatedDoc);
+
       
-      res.send({result,updatedRoom})
+      const result=await roomsCollection.updateOne(query, updatedDoc)
+      console.log(result);
+      res.send(result)
 
-
+      
     })
 
 

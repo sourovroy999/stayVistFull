@@ -130,10 +130,12 @@ const CheckoutForm = ({closeModal, bookingInfo, refetch}) => {
     toast.success('Room Booked Successfully')
     navigate('/dashboard/my-bookings')
 
+    //3.change room status to booked in db
+    await axiossecure.patch(`/room/status/${bookingInfo?._id}`, {status:true})
     //update ui
     refetch()
     
-    //3.change room status to booked in db
+    
    
     
     } catch (error) {
