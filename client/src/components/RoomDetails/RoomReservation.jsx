@@ -71,7 +71,22 @@ const totalPrice=totalDays * room?.price;
         <Button disabled={room?.booked} onClick={()=>setIsOpen(true)} label={'Reserve'} />
       </div>
       {/* modal */}
-      <BookingModal refetch={refetch}  isOpen={isOpen} closeModal={closeModal} bookingInfo={{...room, price:totalPrice, totalDays, guest:{name: user?.displayName}}} />
+      <BookingModal 
+       refetch={refetch}  
+      isOpen={isOpen} 
+      closeModal={closeModal} 
+      bookingInfo={
+        {...room,
+          price:totalPrice, 
+          totalDays,
+          guest:{
+          name: user?.displayName,
+          email:user?.email,
+          image:user?.photoURL
+        }
+      }
+        }
+      />
       <hr />
       <div className='p-4 flex items-center justify-between font-semibold text-lg'>
         <div>Total</div>

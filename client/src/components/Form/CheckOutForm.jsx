@@ -36,15 +36,13 @@ const CheckoutForm = ({closeModal, bookingInfo, refetch}) => {
 
     //get client secret
     const getClientSecret=async price=>{
-        // console.log(price);
-        
-        const {data}=await axiossecure.post('/create-payment-intent', {price})
-        // return data;
-        // console.log(data);
-        
-        // console.log('client request from server-->',data);
-        
-        setClientSecret(data.clientSecret)
+        try {
+            const {data}=await axiossecure.post('/create-payment-intent', {price})
+            setClientSecret(data.clientSecret)
+        } catch (error) {
+            console.error('Failed to create payment intent:', error)
+            setCardError(error.response?.data?.error || 'Failed to initialize payment')
+        }
     }
 
     // console.log(clientSecret);
@@ -81,6 +79,7 @@ const CheckoutForm = ({closeModal, bookingInfo, refetch}) => {
     if (error) {
       console.log('[error]', error);
       setCardError(error.message)
+      setProcessing(false)
       return
     } else {
       console.log('[PaymentMethod]', paymentMethod);
@@ -175,11 +174,7 @@ const CheckoutForm = ({closeModal, bookingInfo, refetch}) => {
       />
       
                        <div className='flex mt-2 justify-around'>
-                        <button  type="submit" disabled={!stripe} onClick= {()=> {
-                          
-                          closeModal()
-                        }}
-                          
+                        <button  type="button" onClick={() => closeModal()}
                           className='inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2'
                         >
                           Cancel
