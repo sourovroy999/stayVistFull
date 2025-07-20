@@ -17,6 +17,7 @@ const RoomDetails = () => {
       const { data } = await axiosCommon.get(`/room/${id}`)
       return data
     },
+    enabled:!!id
   })
 
   if (isLoading) return <LoadingSpinner />

@@ -3,6 +3,8 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const nodemailer = require("nodemailer");
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 
@@ -20,6 +22,59 @@ app.use(cors(corsOptions))
 
 app.use(express.json())
 app.use(cookieParser())
+
+
+
+//send email
+const sendEmail=async(emailAddress, emailData)=>{
+  // Create a test account or replace with real credentials.
+const transporter = nodemailer.createTransport({
+  service:"gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.TRANSPORTER_EMAIL,
+    pass: process.env.TRANSPORTER_PASS,
+  },
+});
+
+//verify transporter
+transporter.verify(function(error, success){
+  if(error){
+    console.log(error);
+    
+  }
+  else{
+    console.log('server is ready to take our message');
+    
+  }
+})
+
+const mailBody={
+    from: `"stayVista" <${process.env.TRANSPORTER_EMAIL}>`,
+    to: emailAddress,
+    subject: emailData.subject,
+  
+    html: emailData.message, // HTML body
+  }
+
+  const info =  transporter.sendMail(mailBody, (error, info)=>{
+    if(error){
+      console.log(error);
+      
+    }else{
+      console.log('email sent' +info.response);
+      
+    }
+  });
+
+
+  // console.log(info.messageId);
+  
+
+
+}
 
 // Verify Token Middleware
 const verifyToken = async (req, res, next) => {
@@ -280,6 +335,18 @@ async function run() {
       //insert bookings collection
       const result = await bookingsCollection.insertOne(bookingData);
 
+      //send email to guest
+      sendEmail(bookingData?.guest?.email, {
+        subject:'Booking successful',
+        message:`you'hv successfully booked a room through stayvista. transactionId: ${bookingData.transactionId}`
+      })
+
+        //send email to host
+      sendEmail(bookingData?.host?.email, {
+        subject:'Your room got booked',
+        message:`Get ready to welcome: ${bookingData.guest.name}`
+      })
+
       //i wont use this
       // //change room availiability status
       // const roomId=bookingData?.roomId;
@@ -486,6 +553,21 @@ async function run() {
         chartData ,
         guestSince:timestamp
       })
+
+    })
+
+    //update room data
+    app.put('/room/update/:id', verifyToken, verifyHost, async (req, res) => {
+      const id = req.params.id;
+      const roomData = req.body;
+
+      const query = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: roomData
+      }
+
+      const result = await roomsCollection.updateOne(query, updateDoc)
+      res.send(result)
 
     })
 

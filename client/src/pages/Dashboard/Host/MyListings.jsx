@@ -123,6 +123,7 @@ const MyListings = () => {
                     {rooms.map(room=>(
                         <RoomDataRow key={room._id} room={room} 
                         handleDelete={handleDelete}
+                        refetch={refetch}
                         />
                     ))}
 

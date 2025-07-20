@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import Button from '../Shared/Button/Button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DateRange } from 'react-date-range'
 import { differenceInCalendarDays } from 'date-fns'
 import BookingModal from '../Modal/BookingModal'
@@ -23,6 +23,16 @@ const {user}=useAuth()
       key: 'selection',
     },
   ])
+
+  useEffect(()=>{
+    setState([
+      {
+      startDate: new Date(room.from),
+      endDate: new Date(room.to),
+      key: 'selection',
+    },
+    ])
+  },[room.from, room.to])
 
   const closeModal=()=>{
     setIsOpen(false)
